@@ -1,4 +1,6 @@
-# JellySlider
+# RxJellySlider
+
+This is the RxVersion of JellySlider compatible with swift 5
 
 [![CI Status](http://img.shields.io/travis/popwarsweet/JellySlider.svg?style=flat)](https://travis-ci.org/popwarsweet/JellySlider)
 [![Version](https://img.shields.io/cocoapods/v/JellySlider.svg?style=flat)](http://cocoapods.org/pods/JellySlider)
