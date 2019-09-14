@@ -327,8 +327,7 @@ public class JellySlider: UIView {
 			let location = touch.location(in: self)
 			touchPositionX = location.x
 			
-			print("the value:\(value)\ntheframe:\(self.bounds.width)\nthe touch:\(touchPositionX)\ntheFucking: \(touchPositionX / self.bounds.width)")
-		}
+			}
 	}
 	
 	override public func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
