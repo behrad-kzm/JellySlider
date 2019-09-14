@@ -18,12 +18,7 @@ To run the example project, clone the repo, and run `pod install` from the Examp
 
 ## Installation
 
-JellySlider is available through [CocoaPods](http://cocoapods.org). To install
-it, simply add the following line to your Podfile:
-
-```ruby
-pod "JellySlider"
-```
+Drag and drop JellySlider files in your Xcode Project.
 
 ## Author
 Behrad Kazemi, Behradkzm@gmail.com
