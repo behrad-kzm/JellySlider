@@ -26,7 +26,7 @@ pod "JellySlider"
 ```
 
 ## Author
-
+Behrad Kazemi, Behradkzm@gmail.com
 Kyle Zaragoza, popwarsweet@gmail.com
 
 ## License
