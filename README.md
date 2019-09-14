@@ -19,14 +19,14 @@ A fun replacement for UISlider. The slider uses bezier paths within a CAShapeLay
 
 ## Example
 
-`
+```
 ...
 
 let slider = JellySlider(frame: sliderContaier.bounds)
 
 myFloatDriver.drive(slider.rx.value).disposed(by: disposeBag)
 
-`
+```
 
 ## Installation
 
