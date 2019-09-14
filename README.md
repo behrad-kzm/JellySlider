@@ -22,7 +22,7 @@ To run the example project, clone the repo, and run `pod install` from the Examp
 
 ## Installation
 
-Drag and drop Following files in your Xcode Project:
+Drag and drop Following files from `JellySlider+BEKApps` in your Xcode Project:
 
 - JellySlider.swift
 - JellySlider+RX.swift
