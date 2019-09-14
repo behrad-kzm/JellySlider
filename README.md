@@ -2,6 +2,10 @@
 
 This is the RxVersion of JellySlider compatible with swift 5
 
+## Added Features:
+- set progressValue programatically
+- integrated with RxSwift to bind with your observable<Float>
+
 [![CI Status](http://img.shields.io/travis/popwarsweet/JellySlider.svg?style=flat)](https://travis-ci.org/popwarsweet/JellySlider)
 [![Version](https://img.shields.io/cocoapods/v/JellySlider.svg?style=flat)](http://cocoapods.org/pods/JellySlider)
 [![License](https://img.shields.io/cocoapods/l/JellySlider.svg?style=flat)](http://cocoapods.org/pods/JellySlider)
@@ -18,7 +22,12 @@ To run the example project, clone the repo, and run `pod install` from the Examp
 
 ## Installation
 
-Drag and drop JellySlider files in your Xcode Project.
+Drag and drop Following files in your Xcode Project:
+
+- JellySlider.swift
+- JellySlider+RX.swift
+- SplashParticle.sks
+- spark.png
 
 ## Author
 Behrad Kazemi, Behradkzm@gmail.com
