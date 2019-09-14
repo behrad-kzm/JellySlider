@@ -22,7 +22,8 @@ Drag and drop JellySlider files in your Xcode Project.
 
 ## Author
 Behrad Kazemi, Behradkzm@gmail.com
-Kyle Zaragoza, popwarsweet@gmail.com
+
+Many thanks to Kyle Zaragoza
 
 ## License
 
