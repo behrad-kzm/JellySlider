@@ -1,6 +1,7 @@
 # RxJellySlider
 
-This is the RxVersion of JellySlider compatible with swift 5
+This is the RX Version of JellySlider compatible with swift 5 with cool new Features
+
 
 ## Added Features:
 - set progressValue programatically
@@ -18,19 +19,26 @@ A fun replacement for UISlider. The slider uses bezier paths within a CAShapeLay
 
 ## Example
 
-To run the example project, clone the repo, and run `pod install` from the Example directory first.
+`
+...
+
+let slider = JellySlider(frame: sliderContaier.bounds)
+
+myFloatDriver.drive(slider.rx.value).disposed(by: disposeBag)
+
+`
 
 ## Installation
 
 Drag and drop Following files from `JellySlider+BEKApps` in your Xcode Project:
 
 - JellySlider.swift
-- JellySlider+RX.swift
+- JellySlider+Rx.swift
 - SplashParticle.sks
 - spark.png
 
 ## Author
-Behrad Kazemi, Behradkzm@gmail.com
+Behrad Kazemi, Behradkzm@gmail.com, bekapps.com
 
 Many thanks to Kyle Zaragoza
 
