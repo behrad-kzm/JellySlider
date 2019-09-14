@@ -1,27 +1,28 @@
 //
 //  BezierView.swift
-//  BezierFun
+//  BEKApps.com
 //
 //  Created by Kyle Zaragoza on 6/27/16.
-//  Updated by Behrad Kazemi on 9/14/19.
-//  Copyright © 2019 Kyle Zaragoza. All rights reserved.
+//  Modified by Behrad Kazemi on 9/14/19.
+//  Copyright © 2019 Behrad Kazemi. All rights reserved.
 //
 
 import UIKit
 import SpriteKit
+import RxSwift
 
-public class JellySlider: UIView {
+public class JellySlider: UIControl {
 	
 	// MARK: - Public Properties
 	
 	/// Closure called when user changes value
 	
-	public var onValueChange: ((_ value: CGFloat) -> Void)?
+	public var onValueChange: ((_ value: Float) -> Void)?
 	/// Current value of slider. (ranges: 0-100)
-	public var value: CGFloat {
+	public var value: Float {
 		let trackLength = bounds.width - 2*edgeBoundaryPadding
 		let touchMinusBoundary = bubbleCenterX - edgeBoundaryPadding
-		return touchMinusBoundary/trackLength
+		return Float(touchMinusBoundary/trackLength)
 	}
 	/// Color of track.
 	public var trackColor: UIColor = .black {
@@ -30,9 +31,7 @@ public class JellySlider: UIView {
 		}
 	}
 	
-	
 	// MARK: - Private Properties
-	
 	/// Determines if bubble is showing above the track.
 	private var bubbleHidden = true
 	/// The max radius allowed (bubble radius is adjusted w/ force touch)
@@ -65,14 +64,29 @@ public class JellySlider: UIView {
 			}
 		}
 	}
-	public func setProgress(progress: CGFloat) {
+	public func setProgress(progress: Float) {
 		if progress == value {
 			return
 		}
 		let trackLength = bounds.width - 2*edgeBoundaryPadding
-		let touchMinusBoundary = progress * trackLength
+		let touchMinusBoundary = CGFloat(progress) * trackLength
 		let destinationBubbleCenterX = touchMinusBoundary + edgeBoundaryPadding
-		animationIntoTrackAtPosition(x: destinationBubbleCenterX)
+//		animationIntoTrackAtPosition(x: destinationBubbleCenterX)
+		
+		
+		bubbleHidden = true
+		touchPositionX = acceptableXPosition(x: destinationBubbleCenterX)
+		bubbleCenterX = acceptableXPosition(x: destinationBubbleCenterX)
+		
+		// move down bubble overlay
+		positionOverlayInTrack()
+		
+		// show particle
+		// sprite kit uses gl coordinate space, we must flip
+		let particleY = 2*maxBubbleRadius + 0.1*trackHeight
+		skScene.addChild(splashParticle(center: CGPoint(x: bubbleCenterX, y: skView.bounds.height-particleY), color: trackColor))
+		
+		
 	}
 	/// Center position of the bubble. Updates UI on update.
 	private var bubbleCenterX: CGFloat = 58 {
@@ -98,7 +112,6 @@ public class JellySlider: UIView {
 			} else {
 				propertyChanges()
 			}
-			
 			// update listener
 			onValueChange?(value)
 		}
@@ -157,10 +170,10 @@ public class JellySlider: UIView {
 	
 	// MARK: - Animation
 	
-	private func animationIntoTrackAtPosition(x: CGFloat) {
+	private func animationIntoTrackAtPosition(x: CGFloat, withDuration: Double = 0.2) {
 		// animate path into track
 		let animation = CABasicAnimation(keyPath: "path")
-		animation.duration = 0.2
+		animation.duration = withDuration
 		animation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
 		shapeLayer.add(animation, forKey: "pathAnimation")
 		bubbleHidden = true
@@ -303,6 +316,7 @@ public class JellySlider: UIView {
 	
 	// MARK: - Touch handling
 	override public func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+		super.touchesBegan(touches, with: event)
 		if let touch = touches.first {
 			let location = touch.location(in: self)
 			let animation = CASpringAnimation(keyPath: "path")
@@ -315,6 +329,7 @@ public class JellySlider: UIView {
 	}
 	
 	override public func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+		super.touchesMoved(touches, with: event)
 		if let touch = touches.first {
 			// check if we have force touch, adjust bubble radius to match force
 			if traitCollection.forceTouchCapability == .available {
@@ -326,18 +341,19 @@ public class JellySlider: UIView {
 			// update our touch position
 			let location = touch.location(in: self)
 			touchPositionX = location.x
-			
-			}
+		}
 	}
 	
 	override public func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+		super.touchesEnded(touches, with: event)
 		if let touch = touches.first {
 			let location = touch.location(in: self)
 			animationIntoTrackAtPosition(x: location.x)
 		}
 	}
 	
-	override public func touchesCancelled(_ touches: Set<UITouch>?, with event: UIEvent?) {
+	override public func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+		super.touchesCancelled(touches, with: event)
 		animationIntoTrackAtPosition(x: bubbleCenterX)
 	}
 }
