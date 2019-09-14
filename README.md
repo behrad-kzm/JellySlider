@@ -28,7 +28,7 @@ myFloatDriver.drive(slider.rx.value).disposed(by: disposeBag)
 
 ...
 
-```swift
+```
 
 ## Installation
 
