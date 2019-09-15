@@ -1,11 +1,12 @@
 # RxJellySlider
 
-This is the RX Version of JellySlider compatible with swift 5 with cool new Features
+This is the RX Version of JellySlider compatible with swift 5 with cool new Features and better sliding experience.
 
 
 ## Added Features:
 - set progressValue programatically
 - integrated with RxSwift to bind with your observable<Float>
+- changed Slider super class from UIView to UIControl, now you can use control events.
 
 [![CI Status](http://img.shields.io/travis/popwarsweet/JellySlider.svg?style=flat)](https://travis-ci.org/popwarsweet/JellySlider)
 [![License](https://img.shields.io/cocoapods/l/JellySlider.svg?style=flat)](http://cocoapods.org/pods/JellySlider)
