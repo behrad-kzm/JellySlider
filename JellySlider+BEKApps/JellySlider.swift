@@ -329,7 +329,7 @@ public class JellySlider: UIControl {
 	// MARK: - Touch handling
 	override public func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
 		super.touchesBegan(touches, with: event)
-		Vibrator.vibrate(hardness: 2)
+
 		if let touch = touches.first {
 			let location = touch.location(in: self)
 			startDraggingX = location.x
@@ -360,9 +360,7 @@ public class JellySlider: UIControl {
 			
 			touchPositionX = touchPositionX + (location.x - startDraggingX)
 			startDraggingX = location.x
-			if Int(startDraggingX) % 3 == 0 {
-				Vibrator.vibrate(hardness: 4)
-			}
+
 		}
 	}
 
