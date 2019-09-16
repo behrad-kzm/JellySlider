@@ -12,15 +12,16 @@ import RxSwift
 
 extension Reactive where Base: JellySlider {
 	
+	
 	/// Reactive wrapper for `value` property.
 	public var value: ControlProperty<Float> {
 		return controlProperty(
 			editingEvents: [.allEditingEvents, .valueChanged],
 			getter: { slider in
-				slider.value
+				slider.progress
 		},
 			setter: { slider, value in
-				slider.setProgress(progress: value)
+				slider.progress = value
 		})
 	}
 }
