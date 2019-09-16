@@ -14,12 +14,34 @@ import RxSwift
 public class JellySlider: UIControl {
 	
 	// MARK: - Public Properties
-	
 	/// Closure called when user changes value
 	
 	public var onValueChange: ((_ value: Float) -> Void)?
+	public var progress: Float = 0.0 {
+		didSet {
+			
+			if progress == value {
+				return
+			}
+			let trackLength = bounds.width - 2*edgeBoundaryPadding
+			let touchMinusBoundary = CGFloat(progress) * trackLength
+			let destinationBubbleCenterX = touchMinusBoundary + edgeBoundaryPadding
+			bubbleHidden = true
+			touchPositionX = acceptableXPosition(x: destinationBubbleCenterX)
+			bubbleCenterX = acceptableXPosition(x: destinationBubbleCenterX)
+			
+			// move down bubble overlay
+			positionOverlayInTrack()
+			
+			// show particle
+			// sprite kit uses gl coordinate space, we must flip
+			let particleY = 2*maxBubbleRadius + 0.1*trackHeight
+			skScene.addChild(splashParticle(center: CGPoint(x: bubbleCenterX, y: skView.bounds.height-particleY), color: trackColor))
+			
+		}
+	}
 	/// Current value of slider. (ranges: 0-100)
-	public var value: Float {
+	private var value: Float {
 		let trackLength = bounds.width - 2*edgeBoundaryPadding
 		let touchMinusBoundary = bubbleCenterX - edgeBoundaryPadding
 		return Float(touchMinusBoundary/trackLength)
@@ -32,6 +54,8 @@ public class JellySlider: UIControl {
 	}
 	
 	// MARK: - Private Properties
+	/// Determines start dragging point
+	private var startDraggingX: CGFloat = 0.0
 	/// Determines if bubble is showing above the track.
 	private var bubbleHidden = true
 	/// The max radius allowed (bubble radius is adjusted w/ force touch)
@@ -39,13 +63,13 @@ public class JellySlider: UIControl {
 	/// The min radius allowed (bubble radius is adjusted w/ force touch)
 	private let minBubbleRadius: CGFloat = 16
 	/// Height of bubble peeking out of track when collapsed.
-	private let peekingBubbleHeight: CGFloat = 4
+	private let peekingBubbleHeight: CGFloat = 3
 	/// Radius of bubble when shown above the track.
 	private var bubbleRadius: CGFloat = 16
 	/// Height of track.
-	private let trackHeight: CGFloat = 10
+	private let trackHeight: CGFloat = 8
 	/// Padding extended to the height of the view, to allow some leniency to touch handling.
-	private let bottomTouchPadding: CGFloat = 16
+	private let bottomTouchPadding: CGFloat = 0
 	/// Padding used on either side of the track to restrict bubble from popping off track.
 	// TODO: adjust curves of end caps when bubble extends to edge
 	private var edgeBoundaryPadding: CGFloat {
@@ -64,30 +88,7 @@ public class JellySlider: UIControl {
 			}
 		}
 	}
-	public func setProgress(progress: Float) {
-		if progress == value {
-			return
-		}
-		let trackLength = bounds.width - 2*edgeBoundaryPadding
-		let touchMinusBoundary = CGFloat(progress) * trackLength
-		let destinationBubbleCenterX = touchMinusBoundary + edgeBoundaryPadding
-//		animationIntoTrackAtPosition(x: destinationBubbleCenterX)
-		
-		
-		bubbleHidden = true
-		touchPositionX = acceptableXPosition(x: destinationBubbleCenterX)
-		bubbleCenterX = acceptableXPosition(x: destinationBubbleCenterX)
-		
-		// move down bubble overlay
-		positionOverlayInTrack()
-		
-		// show particle
-		// sprite kit uses gl coordinate space, we must flip
-		let particleY = 2*maxBubbleRadius + 0.1*trackHeight
-		skScene.addChild(splashParticle(center: CGPoint(x: bubbleCenterX, y: skView.bounds.height-particleY), color: trackColor))
-		
-		
-	}
+
 	/// Center position of the bubble. Updates UI on update.
 	private var bubbleCenterX: CGFloat = 58 {
 		didSet {
@@ -139,7 +140,7 @@ public class JellySlider: UIControl {
 		}()
 	/// Sprite Kit scene used for particles.
 	private lazy var skScene: SKScene = { [unowned self] in
-		let scene = SKScene(size: self.bounds.size)
+		let scene = SKScene(size: CGSize(width: self.bounds.width, height: self.bounds.height + 1000))
 		scene.backgroundColor = .clear
 		return scene
 		}()
@@ -164,6 +165,7 @@ public class JellySlider: UIControl {
 	}
 	
 	required public init?(coder aDecoder: NSCoder) {
+		
 		fatalError("init(coder:) has not been implemented")
 	}
 	
@@ -182,11 +184,12 @@ public class JellySlider: UIControl {
 		
 		// move down bubble overlay
 		positionOverlayInTrack()
-		
+
 		// show particle
 		// sprite kit uses gl coordinate space, we must flip
 		let particleY = 2*maxBubbleRadius + 0.1*trackHeight
-		skScene.addChild(splashParticle(center: CGPoint(x: bubbleCenterX, y: skView.bounds.height-particleY), color: trackColor))
+		skScene.addChild(splashParticle(center: CGPoint(x: bubbleCenterX, y: skView.bounds.height - particleY), color: trackColor))
+		progress = value
 	}
 	
 	private func positionOverlayInTrack() {
@@ -313,23 +316,37 @@ public class JellySlider: UIControl {
 		return min(max(x, edgeBoundaryPadding), bounds.width - edgeBoundaryPadding)
 	}
 	
+	override public func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+		let newArea = CGRect(
+			x: self.bounds.origin.x - 8.0,
+			y: self.bounds.origin.y - 8.0,
+			width: self.bounds.size.width + 32.0,
+			height: self.bounds.size.height + 32.0
+		)
+		return newArea.contains(point)
+	}
 	
 	// MARK: - Touch handling
 	override public func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
 		super.touchesBegan(touches, with: event)
+		Vibrator.vibrate(hardness: 2)
 		if let touch = touches.first {
 			let location = touch.location(in: self)
+			startDraggingX = location.x
 			let animation = CASpringAnimation(keyPath: "path")
 			animation.duration = 0.35
 			animation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeOut)
 			shapeLayer.add(animation, forKey: "pathAnimation")
 			bubbleHidden = false
-			touchPositionX = location.x
+			startDraggingX = location.x
+
+			touchPositionX = bubbleCenterX
 		}
 	}
 	
 	override public func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
 		super.touchesMoved(touches, with: event)
+		
 		if let touch = touches.first {
 			// check if we have force touch, adjust bubble radius to match force
 			if traitCollection.forceTouchCapability == .available {
@@ -340,20 +357,33 @@ public class JellySlider: UIControl {
 			}
 			// update our touch position
 			let location = touch.location(in: self)
-			touchPositionX = location.x
+			
+			touchPositionX = touchPositionX + (location.x - startDraggingX)
+			startDraggingX = location.x
+			if Int(startDraggingX) % 3 == 0 {
+				Vibrator.vibrate(hardness: 4)
+			}
 		}
 	}
-	
+
 	override public func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
 		super.touchesEnded(touches, with: event)
+
 		if let touch = touches.first {
 			let location = touch.location(in: self)
-			animationIntoTrackAtPosition(x: location.x)
+			
+			if location.x == startDraggingX{
+				animationIntoTrackAtPosition(x: location.x)
+			}else {
+				animationIntoTrackAtPosition(x: bubbleCenterX)
+			}
 		}
+		sendActions(for: .valueChanged)
 	}
 	
 	override public func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
 		super.touchesCancelled(touches, with: event)
 		animationIntoTrackAtPosition(x: bubbleCenterX)
+		sendActions(for: .valueChanged)
 	}
 }
